@@ -1,0 +1,27 @@
+name: SellWands
+main: Heisenburger69\SellWands\Main
+
+version: 0.6.9
+api: 3.0.0
+load: POSTWORLD
+author: Heisenburger69
+description: Tap a Chest to sell all of its Contents!
+depend: ["EconomyAPI"]
+
+commands:
+ sellwand:
+  description: "Give Sell Wand"
+  usage: "/sellwand <player>"
+  permission: sellwand.command
+
+permissions:
+ sellwand:
+  default: op
+  description: "SellWand root permission"
+  children:
+   sellwand.command:
+    default: op
+    description: "Allows the use of /sellwand"
+   sellwand.use:
+    default: op
+    description: "Allows player use Sell Wands on Chests"
