@@ -59,9 +59,18 @@ class Main extends PluginBase implements Listener {
                 return false;
         }
     }
+    /**
+    *
+    * @param PlayerInteractEvent $event
+    * @priority MONITOR
+    *
+    */
 
     public function onInteract(PlayerInteractEvent $event)
     {
+        if($event->isCancelled()){
+        return;
+        }
         if ($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
             $player = $event->getPlayer();
             if(!$player->hasPermission("sellwand.use")) {
