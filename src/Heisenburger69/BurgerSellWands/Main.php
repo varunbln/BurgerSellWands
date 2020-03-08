@@ -13,6 +13,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Chest;
 use pocketmine\utils\Config;
@@ -91,8 +92,8 @@ class Main extends PluginBase implements Listener
             return;
         }
 
-        $item = $event->getItem();
-        $nbt = $item->getNamedTagEntry("sellwand");
+        $wand = $event->getItem();
+        $nbt = $wand->getNamedTagEntry("sellwand");
         $block = $event->getBlock();
 
         if ($nbt === null) {
@@ -108,12 +109,13 @@ class Main extends PluginBase implements Listener
             if ($chest instanceof Chest) {
                 $inv = $chest->getInventory()->getContents();
                 $revenue = 0;
+                $prices = $this->cfg->get("prices");
                 foreach ($inv as $item) {
-                    if (isset($this->cfg->getAll()[$item->getID() . ":" . $item->getDamage()])) {
-                        $revenue = $revenue + ($item->getCount() * $this->cfg->getAll()[$item->getID() . ":" . $item->getDamage()]);
+                    if (isset($prices[$item->getID() . ":" . $item->getDamage()])) {
+                        $revenue = $revenue + ($item->getCount() * $prices[$item->getID() . ":" . $item->getDamage()]);
                         $chest->getInventory()->remove($item);
-                    } elseif (isset($this->cfg->getAll()[$item->getID()])) {
-                        $revenue = $revenue + ($item->getCount() * $this->cfg->getAll()[$item->getID()]);
+                    } elseif (isset($prices[$item->getID()])) {
+                        $revenue = $revenue + ($item->getCount() * $prices[$item->getID()]);
                         $chest->getInventory()->remove($item);
                     }
                 }
@@ -134,6 +136,7 @@ class Main extends PluginBase implements Listener
                 }
                 $player->sendMessage(C::colorize(str_replace("{MONEY}", $revenue, $usedMsg)));
                 EconomyAPI::getInstance()->addMoney($player->getName(), (int)$revenue);
+                $this->subtractUse($wand, $player);
                 $event->setCancelled(true);
             }
         }
@@ -152,6 +155,10 @@ class Main extends PluginBase implements Listener
         $item = Item::get($id);
         $item->setNamedTagEntry(new IntTag("sellwand", $uses));
 
+        if($uses < 0) {
+            $uses = "Unlimited";
+        }
+        
         $lore = $this->cfg->get("sell-wand-item-lore");
         if (!is_array($lore)) {
             $lore = [
@@ -171,8 +178,30 @@ class Main extends PluginBase implements Listener
         }
 
         $name = $this->cfg->get("sell-wand-item-name");
-        $item->setCustomName(C::RESET . $name);
+        if(!is_string($name)) {
+            $name = "&l&bSell Wand";
+        }
+        $item->setCustomName(C::RESET . C::colorize($name));
         return $item;
     }
 
+    public function subtractUse(Item $item, Player $player)
+    {
+        $nbt = $item->getNamedTagEntry("sellwand");
+        if($nbt === null) {
+            return;
+        }
+
+        $value = $nbt->getValue();
+        $value--;
+
+        if($value === 0) {
+            $player->sendMessage(C::RED . "Your Sell Wand broke!");
+            $player->getInventory()->setItemInHand(Item::get(Item::AIR));
+            return;
+        }
+
+        $wand = $this->constructWand($value);
+        $player->getInventory()->setItemInHand($wand);
+    }
 }
