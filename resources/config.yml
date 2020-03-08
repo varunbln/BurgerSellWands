@@ -1,41 +1,69 @@
-# CONFIG: Selling prices & sellable items
-#put all the ids and their price in here. (feel free to change everything)
-#prices based off https://pastebin.com/uH7waTt9
+#The Item ID for the SellWand, the default is a WOODEN_HOE
+sell-wand-item-id: 290
 
-3: 2
-287: 2
-340: 15
-98: 4
-1: 4
-17: 10
-35: 10
-263: 11
-88: 11
-"351:4": 12
-216: 12
-47: 60
-18: 13
-15: 14
-331: 14
-155: 25
-265: 25
-264: 100
-14: 15
-121: 18
-266: 15 
-165: 20
-20: 15
-406: 15
-153: 15
-173: 99
-56: 100
-5: 2.5
-388: 30
-22: 108
-42: 126
-152: 27
-4: 2
-170: 2.5
-41: 135
-57: 900
-133: 1300
+#The Name to be given to the Sell Wand. Use & for colors.
+sell-wand-item-name: "&l&bSell Wand"
+
+#The Item Lore(Description) for the Sell Wand. Use & for colors.
+#Use the {USES} to display the remaining uses on the Sell Wand.
+sell-wand-item-lore:
+  - "&7Tap a chest to sell its contents!"
+  - " "
+  - "&6Uses: {USES}"
+
+# The message to be sent when there are no items to Sell in the Chest
+sell-wand-no-items-message: "&cThere are no items to sell in this Chest"
+
+# The message to be sent when items in the Chest are sold.
+# Use {MONEY} to display the total revenue from selling the items in the chest.
+sell-wand-use-message: "&a&lSuccess! &r&7sold the contents of the Chest for §8${MONEY}"
+
+# The message to be sent when a player uses a Sell Wand in a protected area.
+# This is useful for servers like Skyblock to prevent players from selling chests not on their island
+sell-wand-cant-use-here-message: "&cYou cannot use Sell Wands here!"
+
+# The message to send players who do not have permission to use Sell Wands
+# The permission node is "sellwand.use"
+sell-wand-no-permission-message: "&cYou do not have permission to use Sell Wands"
+
+# Setup item Sell Prices here
+# Put all the ids and their price in here
+# From SellAll by AndreasHGK
+prices:
+  3: 2
+  287: 2
+  340: 15
+  98: 4
+  1: 4
+  17: 10
+  35: 10
+  263: 11
+  88: 11
+  "351:4": 12
+  216: 12
+  47: 60
+  18: 13
+  15: 14
+  331: 14
+  155: 25
+  265: 25
+  264: 100
+  14: 15
+  121: 18
+  266: 15
+  165: 20
+  20: 15
+  406: 15
+  153: 15
+  173: 99
+  56: 100
+  5: 2.5
+  388: 30
+  22: 108
+  42: 126
+  152: 27
+  4: 2
+  170: 2.5
+  41: 135
+  57: 900
+  133: 1300
