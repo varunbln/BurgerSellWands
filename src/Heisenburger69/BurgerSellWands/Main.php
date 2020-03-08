@@ -130,7 +130,7 @@ class Main extends PluginBase implements Listener
         if ($nbt === null) {
             return;
         }
-        
+
         if ($block->getId() === Block::CHEST) {
             $x = $block->getX();
             $y = $block->getY();
