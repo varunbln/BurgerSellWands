@@ -66,7 +66,7 @@ class Main extends PluginBase implements Listener
      * @param PlayerInteractEvent $event
      * @priority MONITOR
      */
-    public function onInteract(PlayerInteractEvent $event)
+    public function onInteract(PlayerInteractEvent $event): void
     {
         if ($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
             return;
@@ -134,7 +134,7 @@ class Main extends PluginBase implements Listener
                 if (!is_string($usedMsg)) {
                     $usedMsg = "&a&lSuccess! &r&7sold the contents of the Chest for §8\${MONEY}";
                 }
-                $player->sendMessage(C::colorize(str_replace("{MONEY}", $revenue, $usedMsg)));
+                $player->sendMessage(C::colorize(str_replace("{MONEY}", (string)$revenue, $usedMsg)));
                 EconomyAPI::getInstance()->addMoney($player->getName(), (int)$revenue);
                 $this->subtractUse($wand, $player);
                 $event->setCancelled(true);
@@ -170,7 +170,7 @@ class Main extends PluginBase implements Listener
         } else {
             $coloredLore = [];
             foreach ($lore as $line) {
-                $line = str_replace("{USES}", $uses, $line);
+                $line = str_replace("{USES}", (string)$uses, $line);
                 $line = C::RESET . C::colorize($line);
                 $coloredLore[] = $line;
             }
@@ -185,7 +185,7 @@ class Main extends PluginBase implements Listener
         return $item;
     }
 
-    public function subtractUse(Item $item, Player $player)
+    public function subtractUse(Item $item, Player $player): void
     {
         $nbt = $item->getNamedTagEntry("sellwand");
         if($nbt === null) {
@@ -201,7 +201,7 @@ class Main extends PluginBase implements Listener
             return;
         }
 
-        $wand = $this->constructWand($value);
+        $wand = $this->constructWand((int)$value);
         $player->getInventory()->setItemInHand($wand);
     }
 }
