@@ -26,10 +26,9 @@ class Main extends PluginBase implements Listener
 
     public function onEnable(): void
     {
-
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->saveDefaultConfig();
-        $this->cfg = $this->getConfig()->getAll();
+        $this->cfg = $this->getConfig();
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool
@@ -61,39 +60,7 @@ class Main extends PluginBase implements Listener
                 return false;
         }
     }
-
-    public function constructWand(int $uses): Item
-    {
-        $id = $this->cfg->get("sell-wand-item-id");
-        if (!is_int($id)) {
-            $id = Item::WOODEN_HOE;
-        }
-        $item = Item::get($id);
-        $item->setNamedTagEntry(new IntTag("sellwand", $uses));
-
-        $lore = $this->cfg->get("sell-wand-item-lore");
-        if (!is_array($lore)) {
-            $lore = [
-                C::GRAY . "Tap a Chest to sell its contents",
-                " ",
-                C::YELLOW . "Remaining Uses: " . C::GREEN . $uses
-            ];
-            $item->setLore($lore);
-        } else {
-            $coloredLore = [];
-            foreach ($lore as $line) {
-                $line = str_replace("{USES}", $uses, $line);
-                $line = C::RESET . C::colorize($line);
-                $coloredLore[] = $line;
-            }
-            $item->setLore($coloredLore);
-        }
-
-        $name = $this->cfg->get("sell-wand-item-name");
-        $item->setCustomName(C::RESET . $name);
-        return $item;
-    }
-
+    
     /**
      * @param PlayerInteractEvent $event
      * @priority MONITOR
@@ -127,6 +94,7 @@ class Main extends PluginBase implements Listener
         $item = $event->getItem();
         $nbt = $item->getNamedTagEntry("sellwand");
         $block = $event->getBlock();
+
         if ($nbt === null) {
             return;
         }
@@ -141,16 +109,21 @@ class Main extends PluginBase implements Listener
                 $inv = $chest->getInventory()->getContents();
                 $revenue = 0;
                 foreach ($inv as $item) {
-                    if (isset($this->cfg[$item->getID() . ":" . $item->getDamage()])) {
-                        $revenue = $revenue + ($item->getCount() * $this->cfg[$item->getID() . ":" . $item->getDamage()]);
+                    if (isset($this->cfg->getAll()[$item->getID() . ":" . $item->getDamage()])) {
+                        $revenue = $revenue + ($item->getCount() * $this->cfg->getAll()[$item->getID() . ":" . $item->getDamage()]);
                         $chest->getInventory()->remove($item);
-                    } elseif (isset($this->cfg[$item->getID()])) {
-                        $revenue = $revenue + ($item->getCount() * $this->cfg[$item->getID()]);
+                    } elseif (isset($this->cfg->getAll()[$item->getID()])) {
+                        $revenue = $revenue + ($item->getCount() * $this->cfg->getAll()[$item->getID()]);
                         $chest->getInventory()->remove($item);
                     }
                 }
+
                 if ($revenue <= 0) {
-                    $player->sendMessage(C::RED . "There are no items to sell in this Chest");
+                    $noSellables = $this->cfg->get("sell-wand-no-items-message");
+                    if(!is_string($noSellables)) {
+                        $noSellables = "&cThere are no items to sell in this Chest";
+                    }
+                    $player->sendMessage(C::colorize($noSellables));
                     $event->setCancelled(true);
                     return;
                 }
@@ -159,10 +132,47 @@ class Main extends PluginBase implements Listener
                 if (!is_string($usedMsg)) {
                     $usedMsg = "&a&lSuccess! &r&7sold the contents of the Chest for §8\${MONEY}";
                 }
-                EconomyAPI::getInstance()->addMoney($player->getName(), (int)$revenue);
                 $player->sendMessage(C::colorize(str_replace("{MONEY}", $revenue, $usedMsg)));
+                EconomyAPI::getInstance()->addMoney($player->getName(), (int)$revenue);
                 $event->setCancelled(true);
             }
         }
     }
+
+    /**
+     * @param int $uses
+     * @return Item
+     */
+    public function constructWand(int $uses): Item
+    {
+        $id = $this->cfg->get("sell-wand-item-id");
+        if (!is_int($id)) {
+            $id = Item::WOODEN_HOE;
+        }
+        $item = Item::get($id);
+        $item->setNamedTagEntry(new IntTag("sellwand", $uses));
+
+        $lore = $this->cfg->get("sell-wand-item-lore");
+        if (!is_array($lore)) {
+            $lore = [
+                C::GRAY . "Tap a Chest to sell its contents",
+                " ",
+                C::YELLOW . "Remaining Uses: " . C::GREEN . $uses
+            ];
+            $item->setLore($lore);
+        } else {
+            $coloredLore = [];
+            foreach ($lore as $line) {
+                $line = str_replace("{USES}", $uses, $line);
+                $line = C::RESET . C::colorize($line);
+                $coloredLore[] = $line;
+            }
+            $item->setLore($coloredLore);
+        }
+
+        $name = $this->cfg->get("sell-wand-item-name");
+        $item->setCustomName(C::RESET . $name);
+        return $item;
+    }
+
 }
