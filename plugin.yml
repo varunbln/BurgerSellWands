@@ -9,7 +9,7 @@ depend: ["EconomyAPI"]
 commands:
  sellwand:
   description: "Give sell wands to a player"
-  usage: "/sellwand <player> <uses>"
+  aliases: ["sw", "burgersellwand"]
   permission: sellwand.command
 
 permissions:
