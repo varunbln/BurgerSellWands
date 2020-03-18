@@ -71,7 +71,15 @@ class Main extends PluginBase implements Listener
         if ($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
             return;
         }
+        
+        $wand = $event->getItem();
+        $nbt = $wand->getNamedTagEntry("sellwand");
+        $block = $event->getBlock();
 
+        if ($nbt === null) {
+            return;
+        }
+        
         $player = $event->getPlayer();
 
         if (!$player->hasPermission("sellwand.use")) {
@@ -92,13 +100,6 @@ class Main extends PluginBase implements Listener
             return;
         }
 
-        $wand = $event->getItem();
-        $nbt = $wand->getNamedTagEntry("sellwand");
-        $block = $event->getBlock();
-
-        if ($nbt === null) {
-            return;
-        }
 
         if ($block->getId() === Block::CHEST) {
             $x = $block->getX();
