@@ -1,3 +1,5 @@
+[![](https://poggit.pmmp.io/shield.dl.total/BurgerSellWands)](https://poggit.pmmp.io/p/BurgerSellWands)
+
 # BurgerSellWands
 Pocketmine Plugin adding Sell Wands to the game. A Sell Wand allows players to quickly sell items inside a chest with just one click!
 ### Features:
